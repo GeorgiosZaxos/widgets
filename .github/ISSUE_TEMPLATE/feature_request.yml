@@ -1,0 +1,14 @@
+name: Feature request
+description: Suggest a widget or option
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: "What would you like to do?"
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Example API or screenshot

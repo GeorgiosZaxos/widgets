@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "widgets"
+version = "1.0.0rc1"
+description = "Terminal UI widget toolkit: progress, display, data, network and audio widgets"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+license-files = ["LICENSE", "LICENSES.md"]
+authors = [{ name = "widgets contributors" }]
+keywords = ["terminal", "tui", "progress", "tqdm", "widgets", "ansi", "rss", "marquee"]
+dependencies = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Terminals",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/GeorgiosZaxos/widgets"
+Documentation = "https://github.com/GeorgiosZaxos/widgets/blob/main/docs/USER_GUIDE.md"
+Issues = "https://github.com/GeorgiosZaxos/widgets/issues"
+Changelog = "https://github.com/GeorgiosZaxos/widgets/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+unicode = ["wcwidth>=0.2.13"]
+audio = ["numpy>=1.26"]
+rich = ["rich>=13"]
+system = ["psutil>=5.9"]
+images = ["pillow>=10", "qrcode>=7"]
+tz = ["tzdata>=2024.1; sys_platform == 'win32'"]
+data = ["pandas>=2.2"]
+excel = ["openpyxl>=3.1"]
+dev = [
+    "tzdata>=2024.1; sys_platform == 'win32'",
+    "pytest>=8",
+    "hypothesis>=6.100",
+    "tqdm>=4.66",
+    "mypy>=1.10",
+    "ruff>=0.5",
+    "build>=1.2",
+    "twine>=5",
+    "coverage>=7",
+    "pip-audit>=2.7",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+widgets = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "req(*ids): requirement IDs (SRS-WIDGETS-002) verified by the test",
+    "slow: slower tests (pty / threads)",
+]
+
+[tool.mypy]
+exclude = ["tools/gen_asset_data.py"]
+python_version = "3.13"
+strict = true
+mypy_path = "src"
+files = ["src/widgets", "tools", "examples"]
+
+[[tool.mypy.overrides]]
+module = ["tqdm", "tqdm.*"]  # optional: only the tqdm comparison demo/tests import it
+ignore_missing_imports = true
+
+[tool.ruff]
+extend-exclude = ["tools/gen_asset_data.py"]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "RUF"]
+# E501: the formatter wraps code; long docstring lines are tolerated.
+# UP040: plain TypeAlias unions stay usable with isinstance() at runtime.
+ignore = ["E501", "UP040", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+
+[tool.coverage.run]
+source = ["src/widgets"]
+branch = false
+
+[tool.coverage.report]
+show_missing = false
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "\\.\\.\\.$"]
