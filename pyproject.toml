@@ -35,7 +35,7 @@ Changelog = "https://github.com/GeorgiosZaxos/widgets/blob/main/CHANGELOG.md"
 unicode = ["wcwidth>=0.2.13"]
 audio = ["numpy>=1.26"]
 rich = ["rich>=13"]
-system = ["psutil>=5.9"]
+system = ["psutil>=7.2.2"]
 images = ["pillow>=10", "qrcode>=7"]
 tz = ["tzdata>=2024.1; sys_platform == 'win32'"]
 data = ["pandas>=2.2"]
