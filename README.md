@@ -1,4 +1,4 @@
-# widgets
+﻿# widgets
 
 [![CI](https://github.com/GeorgiosZaxos/widgets/actions/workflows/ci.yml/badge.svg)](https://github.com/GeorgiosZaxos/widgets/actions/workflows/ci.yml)
 [![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/)
@@ -15,8 +15,9 @@ widgets, network widgets (RSS, weather) and audio widgets, all behind one widget
 ## Install
 
 ```bash
-pip install .                       # from a checkout; core has no dependencies
-pip install ".[unicode,data,images]"  # optional extras, see below
+pip install termwidgets              # from PyPI (import name: widgets)
+pip install .                        # or from a checkout
+pip install "termwidgets[unicode,data,images]"  # optional extras, see below
 ```
 
 | Extra | Adds | Used for |
@@ -143,3 +144,4 @@ docs/          guides and reports
 ## License
 
 MIT - see [`LICENSE`](LICENSE). Bundled glyph catalogues: see [`LICENSES.md`](LICENSES.md).
+

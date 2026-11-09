@@ -37,7 +37,7 @@ class MissingDependencyError(WidgetsError, ImportError):
         if feature:
             message += f" (required by {feature})"
         if extra:
-            message += f"; install it with: pip install 'widgets[{extra}]'"
+            message += f"; install it with: pip install 'termwidgets[{extra}]'"
         ImportError.__init__(self, message, name=module)
 
 

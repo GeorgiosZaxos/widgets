@@ -6,8 +6,8 @@ default and meaning. Do not edit by hand - edit `tools/manual_content.py` and re
 ## 1. Getting started
 
 ```powershell
-pip install widgets                      # zero runtime dependencies (distribution name may differ on PyPI)
-pip install "widgets[unicode,tz,images]" # optional extras
+pip install termwidgets               # zero runtime dependencies; import name stays `widgets`
+pip install "termwidgets[unicode,tz,images]" # optional extras
 ```
 
 | Extra | Adds | Used by |
@@ -51,7 +51,6 @@ Press `q` to quit. Widgets are positioned with `x, y` (cells, relative to their 
 ### run_app
 
 ```python
-
 run_app(root, *, fps=30.0, duration=None, mode=TerminalMode.FULLSCREEN, on_event=None,
         quit_keys=(), interactive=True, stream=None, input_stream=None, title=None)
 ```
@@ -890,7 +889,7 @@ Import: `from widgets import ClockWidget`
 |---|---|---|---|
 | `x` | `int` | `0` | Column of the widget's top-left cell, relative to its parent container (0 = left edge). |
 | `y` | `int` | `0` | Row of the widget's top-left cell, relative to its parent container (0 = top edge). |
-| `tz` | `str` | `'UTC'` | IANA time-zone name (`'Europe/Athens'`). `'UTC'` always works; others need `tzdata` on Windows (`pip install widgets[tz]`). |
+| `tz` | `str` | `'UTC'` | IANA time-zone name (`'Europe/Athens'`). `'UTC'` always works; others need `tzdata` on Windows (`pip install termwidgets[tz]`). |
 | `seconds` | `bool` | `True` | Show seconds (`HH:MM:SS`) or only `HH:MM`. |
 | `font` | `str \| None` | `None` | Large-character font: a `Font` or a font name from `list_fonts()` (e.g. `'original-5'`, `'rounded-3'`). `None` = plain text. |
 | `now_fn` | `Callable[[], dt.datetime] \| None` | `None` | Callable returning a `datetime` - inject a fake time for tests. |
@@ -1099,7 +1098,7 @@ Import: `from widgets import QrView`
 |---|---|---|---|
 | `x` | `int` | `0` | Column of the widget's top-left cell, relative to its parent container (0 = left edge). |
 | `y` | `int` | `0` | Row of the widget's top-left cell, relative to its parent container (0 = top edge). |
-| `text` | `str` | **required** | Text/URL to encode (needs `pip install widgets[images]` / `qrcode`). |
+| `text` | `str` | **required** | Text/URL to encode (needs `pip install termwidgets[images]` / `qrcode`). |
 | `border` | `int` | `2` | Quiet-zone width in modules around the code (spec minimum is 4; 2 is scannable on most readers). |
 | `name` | `WidgetId \| None` | `None` | Optional unique id (`WidgetId`). Lets you find the widget with `container.get(name)` and labels it in errors and `describe()`. |
 
@@ -1935,7 +1934,7 @@ Import: `from widgets import ProcessMonitor`
 | `y` | `int` | `0` | Row of the widget's top-left cell, relative to its parent container (0 = top edge). |
 | `width` | `int` | `70` | Width in terminal cells (columns). |
 | `height` | `int` | `14` | Height in terminal rows. |
-| `fetch` | `Fetch \| None` | `None` | Callable returning rows `{'pid','name','cpu','mem'}`. Default uses `psutil` (`pip install widgets[system]`). |
+| `fetch` | `Fetch \| None` | `None` | Callable returning rows `{'pid','name','cpu','mem'}`. Default uses `psutil` (`pip install termwidgets[system]`). |
 | `interval` | `float` | `1.0` | Seconds between refreshes. |
 | `name` | `WidgetId \| None` | `None` | Optional unique id (`WidgetId`). Lets you find the widget with `container.get(name)` and labels it in errors and `describe()`. |
 
@@ -2817,7 +2816,7 @@ Each catalogue has `list_*()` and `get_*()` functions. Names below are generated
 
 * **Plain lines instead of a bar** - the output is not a terminal (PyCharm Run window, redirect, CI). Use a real terminal or
   *Emulate terminal in output console*.
-* **`ZoneInfoNotFoundError` on Windows** - `pip install widgets[tz]`.
+* **`ZoneInfoNotFoundError` on Windows** - `pip install termwidgets[tz]`.
 * **Boxes look misaligned** - install `widgets[unicode]` (exact East-Asian/emoji widths) or set `ascii_only=True`.
 * **`LifecycleError`** - call `mount()` before `start()`; `run_app` does it for you.
 * **Nothing moves** - animations advance with `update(dt)`; inside `run_app` this is automatic. `reduced_motion=True` freezes them on purpose.

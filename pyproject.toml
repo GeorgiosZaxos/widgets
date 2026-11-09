@@ -3,14 +3,14 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "widgets"
+name = "termwidgets"
 version = "1.0.0rc1"
 description = "Terminal UI widget toolkit: progress, display, data, network and audio widgets"
 readme = "README.md"
 requires-python = ">=3.13"
 license = "MIT"
 license-files = ["LICENSE", "LICENSES.md"]
-authors = [{ name = "widgets contributors" }]
+authors = [{ name = "Georgios Zaxos" }]
 keywords = ["terminal", "tui", "progress", "tqdm", "widgets", "ansi", "rss", "marquee"]
 dependencies = []
 classifiers = [
@@ -61,6 +61,7 @@ widgets = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # lets tests do `from tests.conftest import ...` under plain `pytest`
 addopts = "-ra --strict-markers"
 markers = [
     "req(*ids): requirement IDs (SRS-WIDGETS-002) verified by the test",
@@ -83,6 +84,9 @@ extend-exclude = ["tools/gen_asset_data.py"]
 line-length = 100
 target-version = "py313"
 src = ["src", "tests", "tools"]
+
+[tool.ruff.format]
+exclude = ["docs/MANUAL.md"]  # generated; code blocks are written compactly
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "RUF"]

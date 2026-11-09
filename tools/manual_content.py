@@ -70,7 +70,7 @@ PARAMS: dict[str, str] = {
     "CalendarWidget.today": "`datetime.date` highlighted as today (default: the real date; inject for tests).",
     "CalendarWidget.selected": "Initially selected `datetime.date`.",
     "CalendarWidget.on_select": "Called with the `date` when the user presses Enter on a day.",
-    "ClockWidget.tz": "IANA time-zone name (`'Europe/Athens'`). `'UTC'` always works; others need `tzdata` on Windows (`pip install widgets[tz]`).",
+    "ClockWidget.tz": "IANA time-zone name (`'Europe/Athens'`). `'UTC'` always works; others need `tzdata` on Windows (`pip install termwidgets[tz]`).",
     "ClockWidget.seconds": "Show seconds (`HH:MM:SS`) or only `HH:MM`.",
     "ClockWidget.now_fn": "Callable returning a `datetime` - inject a fake time for tests.",
     "Countdown.seconds": "Number of seconds to count down from (required).",
@@ -95,7 +95,7 @@ PARAMS: dict[str, str] = {
     "Heatmap.gradient": "A `Gradient` or registered gradient name (default `'heat'`).",
     # ---- Image / QR
     "ImageView.pixels": "2-D grid (`Sequence[Sequence[RGB]]`) of pixels; two pixel rows are drawn per terminal row using `▀`.",
-    "QrView.text": "Text/URL to encode (needs `pip install widgets[images]` / `qrcode`).",
+    "QrView.text": "Text/URL to encode (needs `pip install termwidgets[images]` / `qrcode`).",
     "QrView.border": "Quiet-zone width in modules around the code (spec minimum is 4; 2 is scannable on most readers).",
     # ---- Marquee
     "Marquee.text": "Text to scroll; may contain several lines.",
@@ -240,7 +240,7 @@ PARAMS: dict[str, str] = {
     "LogViewer.max_entries": "Ring-buffer size; oldest entries are dropped.",
     "LogViewer.show_time": "Prefix each line with `HH:MM:SS`.",
     "MarkdownView.text": "Markdown source (headings, lists, quotes, code fences, rules, bold/italic).",
-    "ProcessMonitor.fetch": "Callable returning rows `{'pid','name','cpu','mem'}`. Default uses `psutil` (`pip install widgets[system]`).",
+    "ProcessMonitor.fetch": "Callable returning rows `{'pid','name','cpu','mem'}`. Default uses `psutil` (`pip install termwidgets[system]`).",
     "ProcessMonitor.interval": "Seconds between refreshes.",
     "Table.columns": "Column titles.",
     "Table.rows": "Rows of cell values.",

@@ -120,7 +120,7 @@ def test_require_import_error_is_actionable() -> None:
     message = str(info.value)
     assert "definitely_not_installed_pkg" in message
     assert "audio playback" in message
-    assert "widgets[audio]" in message
+    assert "termwidgets[audio]" in message
     assert isinstance(info.value, ImportError) and isinstance(info.value, WidgetsError)
 
 

@@ -37,16 +37,17 @@ import tempfile
 import threading
 import time
 import traceback
+from collections.abc import Iterator
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Iterator, cast
+from typing import Any, cast
+
+from tqdm.contrib.concurrent import process_map, thread_map
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from widgets.progress import tqdm
 from widgets.progress import tqdm as trange
 from widgets.progress.asyncio import tqdm_asyncio
-from tqdm.contrib.concurrent import process_map, thread_map
-from tqdm.contrib.logging import logging_redirect_tqdm
-
 
 # ---------------------------------------------------------------------------
 # Logging configuration
@@ -69,6 +70,7 @@ def configure_logging() -> None:
 # ---------------------------------------------------------------------------
 # Small reusable workloads
 # ---------------------------------------------------------------------------
+
 
 def simulated_work(value: int) -> int:
     """Top-level function so it can also be used by process_map on Windows."""
@@ -94,8 +96,7 @@ async def async_job(value: int) -> tuple[int, int]:
 
 def number_generator(count: int) -> Iterator[int]:
     """A generator has no length, so its tqdm total must be supplied."""
-    for number in range(count):
-        yield number
+    yield from range(count)
 
 
 def log_section(title: str) -> None:
@@ -109,6 +110,7 @@ def log_section(title: str) -> None:
 # ---------------------------------------------------------------------------
 # 1. Basic iterable progress bars, trange, and common iterables
 # ---------------------------------------------------------------------------
+
 
 def demo_iterables() -> None:
     log_section("1. ITERABLES: range, list, dict, trange, enumerate and zip")
@@ -134,8 +136,13 @@ def demo_iterables() -> None:
     names = [f"file_{i}.txt" for i in range(12)]
     sizes = [1024 * (i + 1) for i in range(12)]
     for index, (name, size) in enumerate(
-        tqdm(zip(names, sizes), total=len(names), desc="zip + enumerate",
-             unit="file", disable=False),
+        tqdm(
+            zip(names, sizes, strict=False),
+            total=len(names),
+            desc="zip + enumerate",
+            unit="file",
+            disable=False,
+        ),
         start=1,
     ):
         _ = (index, name, size)
@@ -157,6 +164,7 @@ def demo_iterables() -> None:
 # 2. Manual progress, byte units, context managers and file I/O
 # ---------------------------------------------------------------------------
 
+
 def demo_manual_and_file_io() -> None:
     log_section("2. MANUAL UPDATE, BYTE UNITS, FILE I/O AND CONTEXT MANAGERS")
 
@@ -173,14 +181,17 @@ def demo_manual_and_file_io() -> None:
         file_path.write_bytes(payload)
         file_size = file_path.stat().st_size
 
-        with file_path.open("rb") as source, tqdm(
-            total=file_size,
-            desc="Reading file",
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            disable=False,
-        ) as bar:
+        with (
+            file_path.open("rb") as source,
+            tqdm(
+                total=file_size,
+                desc="Reading file",
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                disable=False,
+            ) as bar,
+        ):
             while True:
                 chunk = source.read(16 * 1024)
                 if not chunk:
@@ -193,6 +204,7 @@ def demo_manual_and_file_io() -> None:
 # ---------------------------------------------------------------------------
 # 3. Appearance, custom format, postfix, dynamic description and tqdm.write
 # ---------------------------------------------------------------------------
+
 
 def demo_customization() -> None:
     log_section("3. CUSTOM FORMATTING, POSTFIX, ASCII, DYNAMIC DESC AND WRITE")
@@ -251,6 +263,7 @@ def demo_customization() -> None:
 # 4. Nested progress bars
 # ---------------------------------------------------------------------------
 
+
 def demo_nested_bars() -> None:
     log_section("4. NESTED PROGRESS BARS WITH position AND leave")
 
@@ -264,7 +277,7 @@ def demo_nested_bars() -> None:
         unit="chapter",
         disable=False,
     ):
-        for segment in tqdm(
+        for _segment in tqdm(
             range(8),
             desc=f"Chapter {chapter + 1}: segments",
             position=1,
@@ -278,6 +291,7 @@ def demo_nested_bars() -> None:
 # ---------------------------------------------------------------------------
 # 5. Performance controls: mininterval, miniters, smoothing and refresh
 # ---------------------------------------------------------------------------
+
 
 def demo_performance_controls() -> None:
     log_section("5. PERFORMANCE CONTROLS")
@@ -332,6 +346,7 @@ def demo_performance_controls() -> None:
 # 6. pandas integration
 # ---------------------------------------------------------------------------
 
+
 def demo_pandas() -> None:
     log_section("6. PANDAS progress_apply (optional dependency)")
 
@@ -358,12 +373,15 @@ def demo_pandas() -> None:
         return math.sqrt(row["a"] ** 2 + row["b"] ** 2)
 
     frame["magnitude"] = frame.progress_apply(calculate_row, axis=1)
-    tqdm.write(f"pandas result rows: {len(frame)}; last magnitude: {frame['magnitude'].iloc[-1]:.2f}")
+    tqdm.write(
+        f"pandas result rows: {len(frame)}; last magnitude: {frame['magnitude'].iloc[-1]:.2f}"
+    )
 
 
 # ---------------------------------------------------------------------------
 # 7. Asyncio integration
 # ---------------------------------------------------------------------------
+
 
 def demo_asyncio() -> None:
     log_section("7. ASYNCIO WITH tqdm.asyncio")
@@ -387,6 +405,7 @@ def demo_asyncio() -> None:
 # ---------------------------------------------------------------------------
 # 8. Thread and process concurrency helpers
 # ---------------------------------------------------------------------------
+
 
 def demo_concurrency() -> None:
     log_section("8. CONCURRENT MAPPING: thread_map AND process_map")
@@ -421,6 +440,7 @@ def demo_concurrency() -> None:
 # 9. Logging integration
 # ---------------------------------------------------------------------------
 
+
 def demo_logging() -> None:
     log_section("9. LOGGING REDIRECTED THROUGH tqdm")
 
@@ -438,6 +458,7 @@ def demo_logging() -> None:
 # ---------------------------------------------------------------------------
 # 10. Download callback integration (local HTTP server; no internet needed)
 # ---------------------------------------------------------------------------
+
 
 def demo_download_callback() -> None:
     log_section("10. DOWNLOAD CALLBACK WITH urllib.urlretrieve")
@@ -509,6 +530,7 @@ def demo_download_callback() -> None:
 # 11. Optional Keras and Dask integration patterns
 # ---------------------------------------------------------------------------
 
+
 def demo_optional_integrations() -> None:
     log_section("11. OPTIONAL KERAS AND DASK INTEGRATIONS")
 
@@ -522,9 +544,10 @@ def demo_optional_integrations() -> None:
     #
     # This is a callback integration, not a replacement for Keras metrics.
     try:
-        from tqdm.keras import TqdmCallback  # noqa: F401
+        from tqdm.keras import TqdmCallback
+
         tqdm.write("Keras tqdm callback is available (TensorFlow/Keras training not started).")
-    except Exception as exc:  # noqa: BLE001 - optional dependency probe
+    except Exception as exc:
         tqdm.write(f"Keras integration unavailable: {type(exc).__name__}: {exc}")
 
     # Dask:
@@ -534,8 +557,9 @@ def demo_optional_integrations() -> None:
     #       result = dask.compute(delayed_result)
     try:
         from tqdm.dask import TqdmCallback  # noqa: F401
+
         tqdm.write("Dask tqdm callback is available (no distributed job started).")
-    except Exception as exc:  # noqa: BLE001 - optional dependency probe
+    except Exception as exc:
         tqdm.write(f"Dask integration unavailable: {type(exc).__name__}: {exc}")
 
     # Notebook-specific imports:
@@ -546,8 +570,9 @@ def demo_optional_integrations() -> None:
     # on the environment. In this desktop app we use ordinary terminal tqdm.
     try:
         from tqdm.auto import tqdm as auto_tqdm  # noqa: F401
+
         tqdm.write("tqdm.auto is available for automatic notebook/terminal selection.")
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         tqdm.write(f"tqdm.auto unavailable: {exc}")
 
     # tqdm.gui is an experimental GUI progress bar in a separate window.
@@ -557,6 +582,7 @@ def demo_optional_integrations() -> None:
 # ---------------------------------------------------------------------------
 # 12. Environment variables and test-friendly operation
 # ---------------------------------------------------------------------------
+
 
 def demo_environment_controls() -> None:
     log_section("12. ENVIRONMENT AND TEST-FRIENDLY CONTROLS")
@@ -571,6 +597,7 @@ def demo_environment_controls() -> None:
 # ---------------------------------------------------------------------------
 # Execution tracing for the split-screen GUI
 # ---------------------------------------------------------------------------
+
 
 def enable_gui_execution_trace() -> None:
     """Send source line events to stdout for live highlighting in the GUI.
@@ -599,6 +626,7 @@ def enable_gui_execution_trace() -> None:
 # Worker entry point
 # ---------------------------------------------------------------------------
 
+
 def run_all_demos() -> None:
     """Run every demonstration in a predictable order."""
     configure_logging()
@@ -625,6 +653,7 @@ def run_all_demos() -> None:
 # ---------------------------------------------------------------------------
 # PySide6 split-screen viewer
 # ---------------------------------------------------------------------------
+
 
 def run_gui() -> int:
     """Display source on the left and live progress output on the right."""
@@ -703,8 +732,12 @@ def run_gui() -> int:
             self.demo_functions: list[tuple[int, int, str]] = []
             syntax_tree = ast.parse(self.full_source)
             for node in syntax_tree.body:
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("demo_"):
-                    self.demo_functions.append((node.lineno, node.end_lineno or node.lineno, node.name))
+                if isinstance(
+                    node, (ast.FunctionDef, ast.AsyncFunctionDef)
+                ) and node.name.startswith("demo_"):
+                    self.demo_functions.append(
+                        (node.lineno, node.end_lineno or node.lineno, node.name)
+                    )
             self.display_start_line = 1
             self.progress_anchor_line = 1
             self.current_demo_name = ""
@@ -713,7 +746,9 @@ def run_gui() -> int:
 
             right_panel = QWidget()
             right_layout = QVBoxLayout(right_panel)
-            right_layout.addWidget(QLabel("RIGHT — tqdm output aligned with the executing source line"))
+            right_layout.addWidget(
+                QLabel("RIGHT — tqdm output aligned with the executing source line")
+            )
             self.output_view = QPlainTextEdit()
             self.output_view.setReadOnly(True)
             self.output_view.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
@@ -773,13 +808,9 @@ def run_gui() -> int:
                         self.progress_anchor_line = start_line
                         self.progress_by_source_line.clear()
 
-                        snippet = "\n".join(
-                            self.full_source_lines[start_line - 1:end_line]
-                        )
+                        snippet = "\n".join(self.full_source_lines[start_line - 1 : end_line])
                         self.source_view.setPlainText(snippet)
-                        self.output_view.setPlainText(
-                            "\n" * max(0, end_line - start_line)
-                        )
+                        self.output_view.setPlainText("\n" * max(0, end_line - start_line))
                     return
 
         def highlight_source_line(self, line_number: int):
@@ -857,9 +888,7 @@ def run_gui() -> int:
             for char in text:
                 if char in ("\r", "\n"):
                     line = self._stderr_buffer.strip()
-                    if line and (
-                        "|" in line or "%" in line or "it/s" in line or "B/s" in line
-                    ):
+                    if line and ("|" in line or "%" in line or "it/s" in line or "B/s" in line):
                         self.progress_by_source_line[self.progress_anchor_line] = line
                     self._stderr_buffer = ""
                 else:
@@ -937,6 +966,7 @@ def run_gui() -> int:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Complete tqdm feature demonstration.")

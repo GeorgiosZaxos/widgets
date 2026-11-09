@@ -19,7 +19,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-import manual_content as mc  # type: ignore[import-not-found,unused-ignore]  # noqa: E402
+import manual_content as mc  # type: ignore[import-not-found,unused-ignore]
 import widgets
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -448,8 +448,8 @@ default and meaning. Do not edit by hand - edit `tools/manual_content.py` and re
 ## 1. Getting started
 
 ```powershell
-pip install widgets                      # zero runtime dependencies (distribution name may differ on PyPI)
-pip install "widgets[unicode,tz,images]" # optional extras
+pip install termwidgets               # zero runtime dependencies; import name stays `widgets`
+pip install "termwidgets[unicode,tz,images]" # optional extras
 ```
 
 | Extra | Adds | Used by |
@@ -608,7 +608,7 @@ CLOSING = """
 
 * **Plain lines instead of a bar** - the output is not a terminal (PyCharm Run window, redirect, CI). Use a real terminal or
   *Emulate terminal in output console*.
-* **`ZoneInfoNotFoundError` on Windows** - `pip install widgets[tz]`.
+* **`ZoneInfoNotFoundError` on Windows** - `pip install termwidgets[tz]`.
 * **Boxes look misaligned** - install `widgets[unicode]` (exact East-Asian/emoji widths) or set `ascii_only=True`.
 * **`LifecycleError`** - call `mount()` before `start()`; `run_app` does it for you.
 * **Nothing moves** - animations advance with `update(dt)`; inside `run_app` this is automatic. `reduced_motion=True` freezes them on purpose.

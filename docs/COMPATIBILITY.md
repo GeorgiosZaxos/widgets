@@ -9,12 +9,12 @@ previous major), Windows 10 1809+ and Windows 11. 3.13t is best effort. Other in
 | Raw keyboard input | termios | termios | msvcrt + VT input | isolated in `terminal.compat` (NFR-PORT-002) |
 | Colour | truecolor/256/16/none | same | same | `COLORTERM`, `NO_COLOR` honoured; on Windows, truecolor is assumed for Windows Terminal, ConEmu, `TERM_PROGRAM` or console build >= 14931 (Windows 10 1607+, Windows 11); older consoles fall back to 16 colours - set `COLORTERM=truecolor` to force |
 | Unicode -> ASCII fallback | yes | yes | yes | `ascii_only=True` on widgets |
-| Time zones | system tz database | system | needs `tzdata` (`pip install widgets[tz]`) | UTC always works |
+| Time zones | system tz database | system | needs `tzdata` (`pip install termwidgets[tz]`) | UTC always works |
 | Audio | ffplay/mpv/mpg123/aplay/paplay | afplay/ffplay/mpv | `winsound` (.wav only) or ffplay/mpv | `NullBackend` everywhere |
 | Network widgets (`RssReader`, `RssTicker`, `WeatherWidget`) | yes | yes | yes | injectable transport for offline use |
-| `ProcessMonitor` | `psutil` or injected `fetch` | same | same | `pip install widgets[system]` |
-| `ImageView.from_file`, `QrView` | pillow / qrcode | same | same | `pip install widgets[images]` |
-| Spectrum / oscilloscope source | numpy + PCM WAV | same | same | `pip install widgets[audio]`; MP3 and MIDI not supported |
+| `ProcessMonitor` | `psutil` or injected `fetch` | same | same | `pip install termwidgets[system]` |
+| `ImageView.from_file`, `QrView` | pillow / qrcode | same | same | `pip install termwidgets[images]` |
+| Spectrum / oscilloscope source | numpy + PCM WAV | same | same | `pip install termwidgets[audio]`; MP3 and MIDI not supported |
 | pty-based tests | run | run | skipped | no `pty` module on Windows |
 
 Reference terminals for manual verification (NFR-PORT-005): Windows Terminal, iTerm2/Terminal.app, GNOME
