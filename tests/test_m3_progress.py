@@ -1011,3 +1011,22 @@ def test_look_options_render(
     line = screen_of(stream).lines[-1]
     assert "#" in line and "." in line and line[0] in "-\\|/"
     bar.close()
+
+
+@pytest.mark.req("FR-PROG-010")
+def test_bar_format_fixed_width_bar_field(
+    make_manager: Callable[..., tuple[ProgressManager, io.StringIO, ManualClock]],
+) -> None:
+    manager, stream, _clock = make_manager(100)
+    bar = tqdm(
+        total=30,
+        file=stream,
+        manager=manager,
+        bar_format="{desc}: |{bar:20}| {n_fmt}/{total_fmt}",
+        desc="x",
+    )
+    bar.update(15)
+    manager.refresh(force=True)
+    line = screen_of(stream).lines[-1]
+    assert line.startswith("x: |") and line.count("█") == 10 and line.endswith("| 15/30")
+    bar.close()

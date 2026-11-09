@@ -434,3 +434,26 @@ def test_source_swap_runs_unmodified_demo(name: str, monkeypatch: pytest.MonkeyP
     ns: dict[str, Any] = {}
     exec(compile(DEMO, "<demo>", "exec"), ns)
     assert ns["RESULT"] == (13, [1, 2, 3], 4)
+
+
+@pytest.mark.req("FR-PROG-018")
+@pytest.mark.parametrize("cls_name", ["tqdm", "vtqdm"])
+def test_tqdm_class_argument_and_gather(cls_name: str) -> None:
+    import asyncio
+
+    from widgets.progress.asyncio import tqdm_asyncio, vtqdm_asyncio
+    from widgets.progress.contrib.concurrent import thread_map
+
+    cls = getattr(widgets, cls_name)
+    out = io.StringIO()
+    assert thread_map(lambda x: x + 1, range(3), tqdm_class=cls, file=out) == [1, 2, 3]
+
+    async def job(i: int) -> int:
+        return i * i
+
+    gatherer = vtqdm_asyncio if cls_name == "vtqdm" else tqdm_asyncio
+
+    async def go() -> list[int]:
+        return await gatherer.gather(*(job(i) for i in range(4)), file=out)  # type: ignore[no-any-return]
+
+    assert asyncio.run(go()) == [0, 1, 4, 9]

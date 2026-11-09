@@ -15,6 +15,12 @@ versioning: [Semantic Versioning](https://semver.org/).
   `style`, `fill` / `empty` glyphs and tqdm-style `ascii="  ▏▎▍█"` charsets.
 * Vertical bars share terminal rows (side by side, wrapping at the terminal width); finished bars stay beside
   later ones. Horizontal and vertical bars can be mixed in one region. See `examples/tqdm_mixed_demo.py`.
+* `examples/tqdm_complete_demo.py`: the full tqdm feature demo (iterables, byte units, custom `bar_format`, nesting,
+  pandas, asyncio, thread/process maps, logging, download callback, integrations) with a PySide6 split-screen viewer
+  and a `--bars horizontal|vertical` switch.
+* `tqdm_class=` for `thread_map` / `process_map`, class-aware `tqdm_asyncio.gather` / `as_completed`,
+  `vtqdm_asyncio`, `{bar:N}` fixed-width bars in `bar_format`, and the `WIDGETS_NONTTY_INTERVAL` environment
+  override for how often plain progress lines are written when output is not a terminal.
 * `vtqdm` / `vtrange`: vertical-bar variant with the same API (extra `height` option).
 * `tests/test_m17_tqdm_compat.py`: demo-derived tests run against `widgets.tqdm`, `vtqdm` and (when installed)
   real tqdm, plus a source-swap test that runs unmodified `from tqdm import ...` code.

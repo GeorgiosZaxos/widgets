@@ -117,3 +117,17 @@ vtqdm(total=100, height=8, ascii=" ▁▂▃▄▅▆▇█", gradient=["#001f3f
 Vertical bars sit side by side in the same rows; horizontal bars take one row each, so one horizontal
 bar above four vertical ones (or the reverse) just works: create them with `position=0..4`.
 `python examples/tqdm_mixed_demo.py [looks|h1v4|v1h4]` shows all of it.
+
+### The complete demo
+
+`examples/tqdm_complete_demo.py` exercises every tqdm feature with either bar type:
+
+```powershell
+python examples\tqdm_complete_demo.py --worker                    # terminal, horizontal bars
+python examples\tqdm_complete_demo.py --worker --bars vertical    # terminal, vertical bars
+python examples\tqdm_complete_demo.py                             # split-screen GUI (needs PySide6)
+```
+
+Only `select_bars()` differs between the two: it binds `tqdm`, `trange` and `tqdm_asyncio` to the horizontal
+or vertical classes. Helpers that create bars of their own accept `tqdm_class=` (`thread_map`, `process_map`,
+`logging_redirect_tqdm`).

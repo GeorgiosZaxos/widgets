@@ -61,7 +61,10 @@ class VerticalTqdmBar(ProgressIndicator):
             raise ValueError("height must be >= 2")
         self.compact = bar_format is None
         default = CELL_WIDTH if bar_format is None else 40
-        super().__init__(state, default if width is None else width, height, ascii_only=ascii_only)
+        cell = (
+            width if (width is not None and not self.compact) else default
+        )  # ncols only for bar_format
+        super().__init__(state, cell, height, ascii_only=ascii_only)
         self.column = VerticalBar(
             state,
             height,

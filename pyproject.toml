@@ -68,7 +68,7 @@ markers = [
 ]
 
 [tool.mypy]
-exclude = ["tools/gen_asset_data.py"]
+exclude = ["tools/gen_asset_data.py", "examples/tqdm_complete_demo.py"]
 python_version = "3.13"
 strict = true
 mypy_path = "src"

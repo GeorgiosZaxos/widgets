@@ -11,6 +11,7 @@ truncated. Nothing is ever wrapped.
 from __future__ import annotations
 
 import math
+import re
 
 from widgets.assets.bars import BarStyle, get_bar_style
 from widgets.assets.spinners import get_spinner, spinner_frames
@@ -59,6 +60,9 @@ def _truncate(text: str, width: int) -> str:
             break
         out, used = out + ch, used + w
     return out + "…"
+
+
+_BAR_FIELD = re.compile(r"\{bar(?::(\d+))?\}")  # ``{bar}`` or ``{bar:30}`` (tqdm's fixed width)
 
 
 def custom_bar_style(
@@ -247,6 +251,7 @@ class HorizontalBar(ProgressIndicator):
 
     def _render_bar(self, canvas: Canvas) -> None:
         fill, empty, partials, left, right = self.bar_style.glyphs(self.ascii_only)
+        has_bar = self.bar_format is not None and _BAR_FIELD.search(self.bar_format) is not None
         if self.bar_format is not None:
             prefix, suffix = self._split_format()
             cells = max(
@@ -254,14 +259,17 @@ class HorizontalBar(ProgressIndicator):
                 canvas.width - display_width(prefix) - display_width(suffix)
                 - display_width(left) - display_width(right),
             )  # fmt: skip
+            match = _BAR_FIELD.search(self.bar_format)
+            if match is not None and match.group(1):  # ``{bar:30}``: a fixed number of cells
+                cells = min(cells, int(match.group(1)))
             fields: list[str] = [suffix.strip()] if suffix.strip() else []
-            if "{bar}" not in self.bar_format:
+            if not has_bar:
                 cells = 0
         else:
             prefix, cells, fields = self.layout(canvas.width)
         col = 0
         col += canvas.write_text(0, col, prefix, DEFAULT_STYLE)
-        if self.bar_format is not None and "{bar}" not in self.bar_format:
+        if self.bar_format is not None and not has_bar:
             for text in fields:
                 col += canvas.write_text(0, col, text, DEFAULT_STYLE)
             return
@@ -303,7 +311,9 @@ class HorizontalBar(ProgressIndicator):
         """Render the text before and after ``{bar}`` of :attr:`bar_format`."""
         assert self.bar_format is not None
         fields = self._format_fields()
-        head, _, tail = self.bar_format.partition("{bar}")
+        match = _BAR_FIELD.search(self.bar_format)
+        head = self.bar_format if match is None else self.bar_format[: match.start()]
+        tail = "" if match is None else self.bar_format[match.end() :]
         try:
             return head.format_map(fields), tail.format_map(fields)
         except (ValueError, IndexError, AttributeError):

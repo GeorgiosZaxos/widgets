@@ -17,6 +17,7 @@ same stream share one :class:`ProgressManager`, so they never overlap.
 from __future__ import annotations
 
 import contextlib
+import os
 import sys
 import threading
 import time
@@ -70,6 +71,9 @@ def _manager_for(stream: TextIO, mininterval: float) -> ProgressManager:
     manager = _MANAGERS.get(id(stream))
     if manager is None or manager.closed:
         manager = ProgressManager(stream, mininterval=mininterval)
+        nontty = os.environ.get("WIDGETS_NONTTY_INTERVAL")  # e.g. a GUI that reads a pipe
+        if nontty:
+            manager.nontty_interval = float(nontty)
         _MANAGERS[id(stream)] = manager
     else:
         manager.mininterval = min(manager.mininterval, mininterval)
@@ -710,7 +714,9 @@ def wrapattr(
 async def _agather(*coros: Any, **kwargs: Any) -> list[Any]:
     import asyncio
 
-    bar = tqdm(total=len(coros), **kwargs)
+    tqdm_class = kwargs.pop("tqdm_class", tqdm)
+    kwargs.pop("loop", None)
+    bar = tqdm_class(total=len(coros), **kwargs)
     try:
 
         async def one(i: int, c: Any) -> tuple[int, Any]:
@@ -734,7 +740,8 @@ class asyncio_tools:
         import asyncio
 
         coros = list(coros)
-        bar = tqdm(total=len(coros), **kwargs)
+        tqdm_class = kwargs.pop("tqdm_class", tqdm)
+        bar = tqdm_class(total=len(coros), **kwargs)
         try:
             for fut in asyncio.as_completed(coros):
                 yield _Tracked(fut, bar)
